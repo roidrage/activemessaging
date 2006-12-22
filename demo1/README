@@ -1,0 +1,12 @@
+1. Download ActiveMQ: http://activemq.codehaus.org
+2. Unzip the distribution
+3. Edit conf/activemq.xml and add the following connector, the port number 61613 is important:
+<connector>
+  <serverTransport uri="stomp://localhost:61613"/>
+</connector>
+4. Install Stomp:
+gem install stomp
+5. Start one or more pollers with the following command, you can run as many as you like and the message processing will be load balanced over:
+ruby vendor/plugins/activemessaging/poller.rb
+6. Send off some test messages with:
+ruby script/testsend.rb
