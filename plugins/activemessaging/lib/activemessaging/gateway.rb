@@ -290,24 +290,12 @@ module ActiveMessaging
         real_destination = find_destination(destination_name)
         begin
           deliver_message destination_name, body, publisher, headers, timeout
-          check_and_resend_queued destination_name if self.use_store_and_forward
         rescue Timeout::Error, DRb::DRbConnError, Errno::ECONNREFUSED
           ActiveMessaging.logger.error "Couldn't transmit message #{body} to destination #{destination_name} via broker #{real_destination.broker_name}"
           ActiveMessaging::StoredMessage.store!(destination_name, body, headers) if self.use_store_and_forward
         end
       end
 
-      def check_and_resend_queued destination
-        return unless ActiveMessaging::StoredMessage.count > 0
-        messages = ActiveMessaging::StoredMessage.find_all_by_destination(destination.to_s)
-        messages.each do |stored_message|
-          ActiveMessaging::StoredMessage.transaction do
-            deliver_message(destination, stored_message.message, stored_message.headers)
-            stored_message.destroy
-          end
-        end
-      end
-      
       def deliver_message destination, message, publisher = nil, headers = {}, timeout = 1
         real_destination = find_destination(destination)
         details = {

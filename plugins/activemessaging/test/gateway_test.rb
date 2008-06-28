@@ -210,22 +210,6 @@ class GatewayTest < Test::Unit::TestCase
     ActiveMessaging::Gateway.store_and_forward_to :test
     assert_equal true, ActiveMessaging::Gateway.use_store_and_forward
   end
-  # 
-  # def test_publish_should_check_and_resend_queued_messages
-  #   ActiveMessaging::Gateway.store_and_forward_to :test
-  #   ActiveMessaging::StoredMessage.store!("hello_world", "hello, world", {:keep_it => "real"})
-  #   ActiveMessaging::Gateway.destination :hello_world, '/queue/helloWorld'
-  #   ActiveMessaging::Gateway.connection('default').expects(:send).times(2)
-  #   ActiveMessaging::Gateway.publish :hello_world, "test_publish body", self.class, {:keep_it => "real"}, timeout=10
-  # end
-  # 
-  # def test_check_and_resend_should_empty_the_queue
-  #   ActiveMessaging::Gateway.store_and_forward_to :test
-  #   ActiveMessaging::StoredMessage.store!("hello_world", "hello, world", {:keep_it => "real"})
-  #   ActiveMessaging::Gateway.destination :hello_world, '/queue/helloWorld'
-  #   ActiveMessaging::Gateway.check_and_resend_queued :hello_world
-  #   assert_equal 0, ActiveMessaging::StoredMessage.count
-  # end
   
   ## figure out how to test these better - start in a thread perhaps?
   # def test_start
