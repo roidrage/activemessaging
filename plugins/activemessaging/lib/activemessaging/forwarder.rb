@@ -29,5 +29,12 @@ module ActiveMessaging
     def self.run
       self.new.check_and_resend_queued
     end
+    
+    def self.daemonize
+      while true
+        self.run
+        sleep 1
+      end
+    end
   end
 end
