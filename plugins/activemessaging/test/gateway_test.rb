@@ -190,42 +190,42 @@ class GatewayTest < Test::Unit::TestCase
 
   def test_publish_should_store_a_message_when_delivery_failed
     ActiveMessaging::Gateway.store_and_forward_to :test
-    ActiveMessaging::Gateway.expects(:connection).raises(Exception)
     ActiveMessaging::Gateway.destination :hello_world, '/queue/helloWorld'
+    ActiveMessaging::Gateway.expects(:connection).raises(Timeout::Error, "timed out")
     ActiveMessaging::Gateway.publish :hello_world, "test_publish body", self.class, headers={}, timeout=10
     assert_equal 1, ActiveMessaging::StoredMessage.find_all_by_destination('hello_world').size
   end
   
   def test_stored_message_should_store_a_valid_message
     ActiveMessaging::Gateway.store_and_forward_to :test
-    ActiveMessaging::Gateway.expects(:connection).raises(Exception)
     ActiveMessaging::Gateway.destination :hello_world, '/queue/helloWorld'
+    ActiveMessaging::Gateway.expects(:connection).raises(Timeout::Error, "timed out")
     ActiveMessaging::Gateway.publish :hello_world, "test_publish body", self.class, {:keep_it => "real"}, timeout=10
     message = ActiveMessaging::StoredMessage.find(:first)
     assert_equal 'test_publish body', message.message
     assert_equal 'real', message.headers[:keep_it]
   end
-  
+
   def test_fetch_the_database_connection_from_the_broker
     ActiveMessaging::Gateway.store_and_forward_to :test
     assert_equal true, ActiveMessaging::Gateway.use_store_and_forward
   end
-  
-  def test_publish_should_check_and_resend_queued_messages
-    ActiveMessaging::Gateway.store_and_forward_to :test
-    ActiveMessaging::StoredMessage.store!("hello_world", "hello, world", {:keep_it => "real"})
-    ActiveMessaging::Gateway.destination :hello_world, '/queue/helloWorld'
-    ActiveMessaging::Gateway.connection('default').expects(:send).times(2)
-    ActiveMessaging::Gateway.publish :hello_world, "test_publish body", self.class, {:keep_it => "real"}, timeout=10
-  end
-  
-  def test_check_and_resend_should_empty_the_queue
-    ActiveMessaging::Gateway.store_and_forward_to :test
-    ActiveMessaging::StoredMessage.store!("hello_world", "hello, world", {:keep_it => "real"})
-    ActiveMessaging::Gateway.destination :hello_world, '/queue/helloWorld'
-    ActiveMessaging::Gateway.check_and_resend_queued :hello_world
-    assert_equal 0, ActiveMessaging::StoredMessage.count
-  end
+  # 
+  # def test_publish_should_check_and_resend_queued_messages
+  #   ActiveMessaging::Gateway.store_and_forward_to :test
+  #   ActiveMessaging::StoredMessage.store!("hello_world", "hello, world", {:keep_it => "real"})
+  #   ActiveMessaging::Gateway.destination :hello_world, '/queue/helloWorld'
+  #   ActiveMessaging::Gateway.connection('default').expects(:send).times(2)
+  #   ActiveMessaging::Gateway.publish :hello_world, "test_publish body", self.class, {:keep_it => "real"}, timeout=10
+  # end
+  # 
+  # def test_check_and_resend_should_empty_the_queue
+  #   ActiveMessaging::Gateway.store_and_forward_to :test
+  #   ActiveMessaging::StoredMessage.store!("hello_world", "hello, world", {:keep_it => "real"})
+  #   ActiveMessaging::Gateway.destination :hello_world, '/queue/helloWorld'
+  #   ActiveMessaging::Gateway.check_and_resend_queued :hello_world
+  #   assert_equal 0, ActiveMessaging::StoredMessage.count
+  # end
   
   ## figure out how to test these better - start in a thread perhaps?
   # def test_start
