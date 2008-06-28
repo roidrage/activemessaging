@@ -16,24 +16,27 @@ module ActiveMessaging
       end
     rescue Exception => ex
       # TODO more specific error handling
-      logger.error("Error during recovery of message #{e}")
+      logger.error("Error during recovery of message (Error: #{e})")
+      # jump out of the loop, it seems delivering more messages is of no use
+      raise
     end
     
     def check_and_resend_queued
       return unless ActiveMessaging::StoredMessage.count > 0
+      logger.info "Running recovery at #{Time.now}"
       while message = ActiveMessaging::StoredMessage.find(:first)
         forward(message)
       end
     end
     
     def self.run
-      self.new.check_and_resend_queued
+      self.new.check_and_resend_queued rescue nil
     end
     
     def self.daemonize
       while true
         self.run
-        sleep 1
+        sleep 60
       end
     end
   end
