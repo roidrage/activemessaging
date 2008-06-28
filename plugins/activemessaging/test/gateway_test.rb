@@ -208,7 +208,7 @@ class GatewayTest < Test::Unit::TestCase
 
   def test_fetch_the_database_connection_from_the_broker
     ActiveMessaging::Gateway.store_and_forward_to :test
-    assert_equal true, ActiveMessaging::Gateway.use_store_and_forward
+    assert ActiveMessaging::Gateway.use_store_and_forward
   end
   
   ## figure out how to test these better - start in a thread perhaps?
