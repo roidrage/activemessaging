@@ -20,8 +20,7 @@ class ForwarderTest < Test::Unit::TestCase
 
   def test_check_and_resend_should_empty_the_queue
     ActiveMessaging::StoredMessage.store!("hello_world", "hello, world", {:keep_it => "real"})
-    @forwarder.forward ActiveMessaging::StoredMessage.find(:first)
+    @forwarder.check_and_resend_queued
     assert_equal 0, ActiveMessaging::StoredMessage.count
   end
-
 end

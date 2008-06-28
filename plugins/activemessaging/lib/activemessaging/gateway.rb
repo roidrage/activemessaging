@@ -380,7 +380,7 @@ module ActiveMessaging
       def store_and_forward_to(options)
         require 'activemessaging/stored_message'
         ActiveMessaging::StoredMessage.establish_connection options
-        self.use_store_and_forward = true
+        self.use_store_and_forward = options
       end
     end
 
