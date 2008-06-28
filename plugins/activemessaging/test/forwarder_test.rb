@@ -48,4 +48,11 @@ class ForwarderTest < Test::Unit::TestCase
     message.expects(:delivered!).never
     @forwarder.forward message
   end
+  
+  def test_should_not_mark_as_active_when_active
+    message = ActiveMessaging::StoredMessage.store!("hello_world", "hello, world", {:keep_it => "real"})
+    message.active!
+    message.expects(:active!).never
+    @forwarder.forward message
+  end
 end

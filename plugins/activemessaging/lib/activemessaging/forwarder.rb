@@ -9,6 +9,8 @@ module ActiveMessaging
     end
     
     def forward(message)
+      return if message.active
+      
       message.active!
 
       ActiveMessaging::StoredMessage.transaction do
