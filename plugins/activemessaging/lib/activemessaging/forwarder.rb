@@ -33,8 +33,16 @@ module ActiveMessaging
     def check_and_resend_queued
       return unless ActiveMessaging::StoredMessage.count_undelivered > 0
       logger.info "Running recovery at #{Time.now}"
-      while message = ActiveMessaging::StoredMessage.find_next_undelivered
-        forward(message)
+      start = Time.now
+      recovered_messages = 0
+      begin
+        while message = ActiveMessaging::StoredMessage.find_next_undelivered
+          forward(message)
+          recovered_messages += 1
+        end
+      ensure
+        stop = Time.now
+        logger.info("Recovered #{recovered_messages} messages in #{stop.to_i - start.to_i} seconds")
       end
     end
     
