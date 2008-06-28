@@ -55,4 +55,14 @@ class ForwarderTest < Test::Unit::TestCase
     message.expects(:active!).never
     @forwarder.forward message
   end
+  
+  def test_should_mark_as_inactive_when_delivery_fails
+    message = ActiveMessaging::StoredMessage.store!("hello_world", "hello, world", {:keep_it => "real"})
+    ActiveMessaging::Gateway.expects(:deliver_message).raises(Timeout::Error, "timed out")
+    begin
+      @forwarder.forward(message)
+    rescue Timeout::Error
+    end
+    assert_equal false, message.reload.active?
+  end
 end

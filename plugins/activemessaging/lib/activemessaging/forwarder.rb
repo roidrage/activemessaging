@@ -9,13 +9,14 @@ module ActiveMessaging
     end
     
     def forward(message)
-      return if message.active
+      return if message.active?
       
       message.active!
 
       ActiveMessaging::StoredMessage.transaction do
         message.reload
         return if message.delivered? # for the bad case someone else might've 
+        
         ActiveMessaging::Gateway.deliver_message(message.destination.to_sym, message.message, message.headers)
         logger.info("Recovered message for destination #{message.destination.to_s}")
         message.delivered!
@@ -25,6 +26,8 @@ module ActiveMessaging
       logger.error("Error during recovery of message (Error: #{ex})")
       # jump out of the loop, it seems delivering more messages is of no use
       raise
+    ensure
+      message.inactive!
     end
     
     def check_and_resend_queued

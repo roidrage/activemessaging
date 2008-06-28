@@ -17,6 +17,10 @@ class ActiveMessaging::StoredMessage < ActiveRecord::Base
     update_attributes(:active => true)
   end
   
+  def inactive!
+    update_attributes(:active => false)
+  end
+  
   def delivered!
     update_attributes(:delivered => true)
   end
