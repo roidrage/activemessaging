@@ -4,6 +4,7 @@ class CreateActiveMessagingStoredMessage < ActiveRecord::Migration
       t.column :destination, :string
       t.column :message, :text
       t.column :headers, :text
+      t.column :publisher, :text
       t.column :active, :boolean, :default => false
       t.column :delivered, :boolean, :default => false
     end

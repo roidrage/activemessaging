@@ -292,7 +292,7 @@ module ActiveMessaging
           deliver_message destination_name, body, publisher, headers, timeout
         rescue Timeout::Error, DRb::DRbConnError, Errno::ECONNREFUSED
           ActiveMessaging.logger.error "Couldn't transmit message #{body} to destination #{destination_name} via broker #{real_destination.broker_name}"
-          ActiveMessaging::StoredMessage.store!(destination_name, body, headers) if self.use_store_and_forward
+          ActiveMessaging::StoredMessage.store!(destination_name, body, headers, publisher) if self.use_store_and_forward
         end
       end
 

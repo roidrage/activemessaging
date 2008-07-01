@@ -192,7 +192,7 @@ class GatewayTest < Test::Unit::TestCase
     ActiveMessaging::Gateway.store_and_forward_to :test
     ActiveMessaging::Gateway.destination :hello_world, '/queue/helloWorld'
     ActiveMessaging::Gateway.expects(:connection).raises(Timeout::Error, "timed out")
-    ActiveMessaging::Gateway.publish :hello_world, "test_publish body", self.class, headers={}, timeout=10
+    ActiveMessaging::Gateway.publish :hello_world, "test_publish body", self.class.to_s, headers={}, timeout=10
     assert_equal 1, ActiveMessaging::StoredMessage.find_all_by_destination('hello_world').size
   end
   
@@ -200,10 +200,11 @@ class GatewayTest < Test::Unit::TestCase
     ActiveMessaging::Gateway.store_and_forward_to :test
     ActiveMessaging::Gateway.destination :hello_world, '/queue/helloWorld'
     ActiveMessaging::Gateway.expects(:connection).raises(Timeout::Error, "timed out")
-    ActiveMessaging::Gateway.publish :hello_world, "test_publish body", self.class, {:keep_it => "real"}, timeout=10
+    ActiveMessaging::Gateway.publish :hello_world, "test_publish body", self.class.to_s, {:keep_it => "real"}, timeout=10
     message = ActiveMessaging::StoredMessage.find(:first)
     assert_equal 'test_publish body', message.message
     assert_equal 'real', message.headers[:keep_it]
+    assert_equal self.class.to_s, message.publisher
   end
 
   def test_fetch_the_database_connection_from_the_broker
