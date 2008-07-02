@@ -286,7 +286,6 @@ module ActiveMessaging
       def publish destination_name, body, publisher=nil, headers={}, timeout=10
         raise "You cannot have a nil or empty destination name." if destination_name.nil?
         raise "You cannot have a nil or empty message body." if (body.nil? || body.empty?)
-        
         real_destination = find_destination(destination_name)
         begin
           deliver_message destination_name, body, publisher, headers, timeout

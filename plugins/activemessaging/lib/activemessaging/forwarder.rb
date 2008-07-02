@@ -17,7 +17,7 @@ module ActiveMessaging
         message.reload
         return if message.delivered? # for the bad case someone else might've 
         
-        ActiveMessaging::Gateway.deliver_message(message.destination.to_sym, message.message, message.headers)
+        ActiveMessaging::Gateway.deliver_message(message.destination.to_sym, message.message, message.publisher, message.headers)
         logger.info("Recovered message for destination #{message.destination.to_s}")
         message.delivered!
       end

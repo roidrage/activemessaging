@@ -2,7 +2,7 @@ class ActiveMessaging::StoredMessage < ActiveRecord::Base
   set_table_name 'stored_messages'
   serialize :message
   serialize :headers
-  serialize :publisher
+  before_create :stringify_publisher
   
   def self.store!(destination, message, headers, publisher = nil)
     stored_message = self.new :destination => destination.to_s, :message => message, :headers => headers, :publisher => publisher
@@ -26,7 +26,16 @@ class ActiveMessaging::StoredMessage < ActiveRecord::Base
     update_attributes(:delivered => true)
   end
   
+  def publisher
+    read_attribute(:publisher).constantize rescue read_attribute(:publisher)
+  end
+  
   def self.find_next_undelivered
     find(:first, :conditions => ["delivered = ? and active = ?", false, false])
+  end
+  
+  private
+  def stringify_publisher
+    self.publisher = publisher.to_s
   end
 end
